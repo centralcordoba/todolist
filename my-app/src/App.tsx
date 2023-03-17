@@ -8,6 +8,7 @@ const App: FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [task, setTask] = useState<string>("");
   const [deadline, setDeadLine] = useState<string>();
+  
   const [todoList, setTodoList] = useState<
     { taskName: string; deadline: string | undefined }[]
   >([]);
@@ -18,6 +19,12 @@ const App: FC = () => {
     } else {
       setDeadLine(event.target.value);
     }
+  };
+
+  const handleChangeFilter = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (event.target.name === "filter") {
+      setFilter(event.target.value);
+    } 
   };
 
   TaskDataService.getAll()
@@ -62,24 +69,26 @@ const App: FC = () => {
     );
   };
 
-  const handleOnClick = () => {
-    const findTask =
-      todoList?.length > 0
-        ? todoList?.filter((f) => f.taskName === filter)
-        : undefined;
-    const newTask = { taskName: task, deadline: deadline };
-    //setTodoList([...todoList, findTask.]);
-    setTodoList([...todoList, newTask]);
+  const handleOnClickFilter = (): void => {
+    setTodoList(
+      todoList.filter((task) => {
+        return task.taskName === filter;
+        
+      })
+    );
   };
 
   return (
     <div className="App">
       <div className="header"></div>
-
-      <div className="inputContainer">
-        <input type="text" placeholder="filter..." value={filter} />
-
-        <button onClick={handleOnClick}>Filter</button>
+      <div>
+        <input 
+        type="text" 
+        placeholder="filter..." 
+        name="filter"
+        value={filter} 
+        onChange={handleChangeFilter}/>
+        <button onClick={handleOnClickFilter}>Filter</button>
       </div>
 
       <div className="inputContainer">
