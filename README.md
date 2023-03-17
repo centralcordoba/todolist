@@ -1,4 +1,4 @@
 # todolist
-git clone repository
-npm install
-npm start
+#git clone repository
+#npm install
+#npm start
