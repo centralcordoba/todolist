@@ -3,12 +3,13 @@ import "./App.css";
 import TodoTask from "./Components/TodoTask";
 import { ITask } from "./Interfaces";
 import TaskDataService from "./Services/task.service";
+import { Alert, AlertTitle } from "@chakra-ui/react";
 
 const App: FC = () => {
   const [filter, setFilter] = useState<string>("");
   const [task, setTask] = useState<string>("");
   const [deadline, setDeadLine] = useState<string>();
-  
+  const [showAlert, setShowAlert] = useState(false);
   const [todoList, setTodoList] = useState<
     { taskName: string; deadline: string | undefined }[]
   >([]);
@@ -24,7 +25,7 @@ const App: FC = () => {
   const handleChangeFilter = (event: ChangeEvent<HTMLInputElement>): void => {
     if (event.target.name === "filter") {
       setFilter(event.target.value);
-    } 
+    }
   };
 
   TaskDataService.getAll()
@@ -49,16 +50,24 @@ const App: FC = () => {
   };
 
   const addTask = (): void => {
-    const newTask = { taskName: task, deadline: deadline };
-    setTodoList([...todoList, newTask]);
-
-    TaskDataService.create(newTask)
-      .then((response: any) => {
-        console.log(response.data);
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
+    if (task !== undefined && task !== "" && deadline !=="" && deadline !== undefined) {
+      const newTask = { taskName: task, deadline: deadline };
+      setTodoList([...todoList, newTask]);
+      setShowAlert(false);
+     // const newTaskr = { taskName: "", deadline: "" };
+      //setTodoList([...todoList, newTaskr]);
+      setTask("");
+      //setDeadLine("");
+      TaskDataService.create(newTask)
+        .then((response: any) => {
+          console.log(response.data);
+        })
+        .catch((e: Error) => {
+          console.log(e);
+        });
+    } else {
+      setShowAlert(true);
+    }
   };
 
   const completeTask = (taskNameToDelete: string): void => {
@@ -73,7 +82,6 @@ const App: FC = () => {
     setTodoList(
       todoList.filter((task) => {
         return task.taskName === filter;
-        
       })
     );
   };
@@ -82,12 +90,13 @@ const App: FC = () => {
     <div className="App">
       <div className="header"></div>
       <div>
-        <input 
-        type="text" 
-        placeholder="filter..." 
-        name="filter"
-        value={filter} 
-        onChange={handleChangeFilter}/>
+        <input
+          type="text"
+          placeholder="filter..."
+          name="filter"
+          value={filter}
+          onChange={handleChangeFilter}
+        />
         <button onClick={handleOnClickFilter}>Filter</button>
       </div>
 
@@ -106,10 +115,15 @@ const App: FC = () => {
           <option value="completed">Completed</option>
           <option value="nocompleted">No Completed</option>
         </select>
-
         <button onClick={addTask}>Add Task</button>
       </div>
-
+      {showAlert && (
+        <div>
+          <Alert status="warning"  variant='solid'>
+            <AlertTitle>Your should add data into fields</AlertTitle>
+          </Alert>
+        </div>
+      )}
       <div className="todoList">
         {todoList.map((task: ITask, key: number) => {
           return <TodoTask key={key} task={task} completeTask={completeTask} />;
